@@ -1,84 +1,728 @@
-<!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-	<title>Memory with you</title>
-	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-	<style type="text/css">
-		@font-face {
-			font-family: digit;
-			font-weight:300;
-			src: url('digital-7_mono.ttf') format("truetype");
-		}
-		.comments{ font-size:20px}
-	</style>
-	<link href="css/default.css" type="text/css" rel="stylesheet">
-	<script type="text/javascript" src="js/jquery.js"></script>
-	<script type="text/javascript" src="js/garden.js"></script>
-    <script type="text/javascript" src="js/functions.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memory with you | Blog</title>
+  <style>
+    :root {
+      --bg: #0f0f14;
+      --bg-soft: #171821;
+      --card: rgba(255,255,255,0.08);
+      --text: #f4f4f6;
+      --muted: #c9c9d4;
+      --line: rgba(255,255,255,0.12);
+      --accent: #f3b7c5;
+      --accent-2: #d88aa0;
+      --shadow: 0 10px 30px rgba(0,0,0,0.28);
+      --max: 1120px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.06), transparent 30%),
+        linear-gradient(180deg, #11121a 0%, #0c0d13 100%);
+      line-height: 1.7;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .container {
+      width: min(var(--max), calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    /* ========== 首屏封面 ========== */
+    .cover {
+      min-height: 100vh;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 50% 35%, rgba(243,183,197,0.18), transparent 18%),
+        radial-gradient(circle at 50% 40%, rgba(255,255,255,0.08), transparent 22%),
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+    }
+
+    .cover::before,
+    .cover::after {
+      content: "";
+      position: absolute;
+      inset: auto;
+      width: 520px;
+      height: 520px;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+      pointer-events: none;
+    }
+
+    .cover::before {
+      top: -120px;
+      left: -120px;
+      background: #ff7aa2;
+    }
+
+    .cover::after {
+      right: -140px;
+      bottom: -140px;
+      background: #a88dff;
+    }
+
+    .cover-inner {
+      position: relative;
+      z-index: 2;
+      width: min(1080px, calc(100% - 40px));
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 40px;
+      align-items: center;
+    }
+
+    .poem-box,
+    .heart-box {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .poem-box {
+      padding: 40px 36px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 18px;
+    }
+
+    .cover-title {
+      font-size: clamp(36px, 6vw, 64px);
+      line-height: 1.08;
+      margin: 0 0 16px;
+      letter-spacing: 1px;
+    }
+
+    .cover-subtitle {
+      margin: 0 0 26px;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 560px;
+    }
+
+    .poem {
+      margin: 24px 0 0;
+      color: #f7e7ec;
+      font-size: 18px;
+      line-height: 2;
+      white-space: pre-line;
+    }
+
+    .poem-sign {
+      margin-top: 12px;
+      color: rgba(255,255,255,0.7);
+      font-size: 15px;
+    }
+
+    .cover-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 28px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      cursor: pointer;
+      border-radius: 999px;
+      padding: 14px 24px;
+      font-size: 15px;
+      transition: transform .2s ease, opacity .2s ease, background .2s ease;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #20161a;
+      font-weight: 700;
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.08);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .heart-box {
+      min-height: 560px;
+      padding: 24px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .heart-stage {
+      position: relative;
+      width: 100%;
+      height: 420px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #heartCanvas {
+      width: min(100%, 460px);
+      height: 420px;
+      display: block;
+    }
+
+    .heart-words {
+      text-align: center;
+      margin-top: 10px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .heart-msg {
+      font-size: 22px;
+      margin-bottom: 8px;
+      color: #fff2f5;
+    }
+
+    .clock {
+      font-size: 30px;
+      font-weight: 700;
+      color: #ffd8e2;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+    }
+
+    .heart-loveu {
+      color: rgba(255,255,255,0.84);
+      font-size: 16px;
+    }
+
+    .music-tip {
+      margin-top: 20px;
+      color: rgba(255,255,255,0.58);
+      font-size: 13px;
+    }
+
+    .scroll-tip {
+      position: absolute;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.72);
+      font-size: 14px;
+      letter-spacing: 2px;
+      animation: floatY 2s ease-in-out infinite;
+    }
+
+    @keyframes floatY {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(6px); }
+    }
+
+    /* ========== 博客区 ========== */
+    .blog-shell {
+      padding: 84px 0 100px;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+      background: rgba(12,13,19,0.72);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .site-nav {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 28px;
+      margin-bottom: 34px;
+    }
+
+    .hero-card,
+    .panel,
+    .post-card,
+    .about-card,
+    .footer-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-card {
+      padding: 34px;
+    }
+
+    .hero-card h2 {
+      margin: 0 0 14px;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.15;
+    }
+
+    .hero-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel h3,
+    .section-title {
+      margin: 0 0 16px;
+      font-size: 22px;
+    }
+
+    .meta-list {
+      display: grid;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 28px;
+      align-items: start;
+    }
+
+    .posts {
+      display: grid;
+      gap: 24px;
+    }
+
+    .post-card {
+      padding: 28px;
+      transition: transform .2s ease, border-color .2s ease;
+    }
+
+    .post-card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(255,255,255,0.22);
+    }
+
+    .post-tag {
+      display: inline-block;
+      margin-bottom: 14px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(243,183,197,0.14);
+      color: #ffd9e2;
+      font-size: 13px;
+    }
+
+    .post-card h3 {
+      margin: 0 0 12px;
+      font-size: 28px;
+      line-height: 1.25;
+    }
+
+    .post-meta {
+      color: rgba(255,255,255,0.6);
+      font-size: 14px;
+      margin-bottom: 16px;
+    }
+
+    .post-excerpt {
+      color: var(--muted);
+      font-size: 16px;
+      margin-bottom: 18px;
+    }
+
+    .read-more {
+      color: #ffd9e2;
+      font-weight: 600;
+    }
+
+    .sidebar {
+      display: grid;
+      gap: 24px;
+      position: sticky;
+      top: 96px;
+    }
+
+    .about-card,
+    .footer-card {
+      padding: 24px;
+    }
+
+    .about-card p,
+    .footer-card p,
+    .cat-list,
+    .archive-list {
+      color: var(--muted);
+      margin: 0;
+      font-size: 15px;
+    }
+
+    .cat-list,
+    .archive-list {
+      display: grid;
+      gap: 12px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .site-footer {
+      margin-top: 36px;
+    }
+
+    .footer-card {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px 24px;
+    }
+
+    /* ========== 响应式 ========== */
+    @media (max-width: 980px) {
+      .cover-inner,
+      .hero,
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .heart-box { min-height: auto; }
+      .sidebar { position: static; }
+    }
+
+    @media (max-width: 640px) {
+      .poem-box,
+      .hero-card,
+      .panel,
+      .post-card,
+      .about-card,
+      .footer-card {
+        border-radius: 20px;
+      }
+
+      .poem-box,
+      .hero-card,
+      .post-card,
+      .about-card,
+      .footer-card,
+      .panel {
+        padding: 22px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .cover-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .post-card h3 {
+        font-size: 24px;
+      }
+    }
+  </style>
 </head>
-
 <body>
-	<div id="mainDiv">
-		<div id="content">
-			<div id="code">
-				<span class="space"/><span class="comments"> 纤云弄巧，飞星传恨，</span><br />
-				<span class="space"/><span class="comments"> 银汉迢迢暗度。</span><br />
-				<span class="space"/><span class="comments"> 金风玉露一相逢，</span><br />
-				<span class="space"/><span class="comments">便胜却、人间无数。</span><br />
-				<span class="space"/><span class="comments">柔情似水，佳期如梦，</span><br />
-				<span class="space"/><span class="comments">忍顾鹊桥归路。</span><br />
-				<span class="space"/><span class="comments">两情若是久长时，</span><br />
-				<span class="space"/><span class="comments">又岂在、朝朝暮暮。</span><br />
-				<span class="space"/><span class="comments">---------------《鹊桥仙》 秦观</span><br />
-			</div>
-			<div id="loveHeart">
-				<canvas id="garden"></canvas>
-				<div id="words">
-					<div id="messages">
-						Nannnn, celebration of our marriage for
-						<div id="elapseClock"></div>
-					</div>
-					<div id="loveu">
-						Love u forever and ever.<br/>
-						<div class="signature">- zhang</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<script type="text/javascript">
-		var offsetX = $("#loveHeart").width() / 2;
-		var offsetY = $("#loveHeart").height() / 2 - 55;
-		var together = new Date();
-		together.setFullYear(2018, 2, 2);
-		together.setHours(12);
-		together.setMinutes(22);
-		together.setSeconds(0);
-		together.setMilliseconds(0);
-		
-		if (!document.createElement('canvas').getContext) {
-			var msg = document.createElement("div");
-			msg.id = "errorMsg";
-			msg.innerHTML = "Your browser doesn't support HTML5!<br/>Recommend use Chrome 14+/IE 9+/Firefox 7+/Safari 4+"; 
-			document.body.appendChild(msg);
-			$("#code").css("display", "none")
-			$("#copyright").css("position", "absolute");
-			$("#copyright").css("bottom", "10px");
-		    document.execCommand("stop");
-		} else {
-			setTimeout(function () {
-				startHeartAnimation();
-			}, 5000);
+  <section class="cover" id="cover">
+    <div class="cover-inner">
+      <div class="poem-box">
+        <div class="eyebrow">Memory with you · 封面首页</div>
+        <h1 class="cover-title">把心动写成岁月，<br>把相守写成故事。</h1>
+        <p class="cover-subtitle">
+          这一页作为博客封面，保留诗意、纪念感与仪式感；点击下方按钮后，进入真正的博客内容页面。
+          你后续可以把这里替换成个人介绍、情侣纪念、品牌宣言，或者博客导语。
+        </p>
 
-			timeElapse(together);
-			setInterval(function () {
-				timeElapse(together);
-			}, 500);
+        <div class="poem">纤云弄巧，飞星传恨，
+银汉迢迢暗度。
+金风玉露一相逢，
+便胜却、人间无数。
+柔情似水，佳期如梦，
+忍顾鹊桥归路。
+两情若是久长时，
+又岂在、朝朝暮暮。</div>
+        <div class="poem-sign">——《鹊桥仙》· 秦观</div>
 
-			adjustCodePosition();
-			$("#code").typewriter();
-		}
-	</script>
-	<iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=36307139&auto=1&height=66"></iframe>
+        <div class="cover-actions">
+          <button class="btn btn-primary" id="enterBlogBtn">进入博客</button>
+          <a class="btn btn-secondary" href="#blog">向下浏览</a>
+        </div>
+      </div>
+
+      <div class="heart-box">
+        <div class="heart-stage">
+          <canvas id="heartCanvas" width="460" height="420"></canvas>
+        </div>
+        <div class="heart-words">
+          <div class="heart-msg">Nannnn, celebration of our marriage for</div>
+          <div class="clock" id="elapseClock">0000 days 00:00:00</div>
+          <div class="heart-loveu">Love u forever and ever. <span style="opacity:.7;">— zhang</span></div>
+          <div class="music-tip">可在此处嵌入背景音乐播放器</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="scroll-tip">SCROLL / CLICK TO ENTER</div>
+  </section>
+
+  <header class="site-header">
+    <div class="container site-nav">
+      <div class="brand">Memory Blog</div>
+      <nav class="nav-links">
+        <a href="#blog">首页</a>
+        <a href="#posts">文章</a>
+        <a href="#about">关于</a>
+        <a href="#footer">联系</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="blog-shell" id="blog">
+    <div class="container">
+      <section class="hero">
+        <article class="hero-card">
+          <div class="eyebrow">Featured Story</div>
+          <h2>欢迎来到我的博客：记录生活、技术与那些值得珍藏的瞬间</h2>
+          <p>
+            这个博客主页采用“封面 + 正文”的结构。首屏负责氛围营造，正文负责内容承载。
+            你可以把它用作个人博客、成长记录、情侣纪念站、摄影笔记或技术文章首页。
+          </p>
+        </article>
+
+        <aside class="panel">
+          <h3>站点信息</h3>
+          <div class="meta-list">
+            <div>站点名称：Memory Blog</div>
+            <div>风格定位：温柔 / 纪念 / 轻杂志感</div>
+            <div>适用场景：个人博客、情侣主页、作品集首页</div>
+            <div>建议部署：GitHub Pages / Netlify / Vercel / 静态服务器</div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="content-grid">
+        <div class="posts" id="posts">
+          <article class="post-card">
+            <div class="post-tag">生活记录</div>
+            <h3>把日常写成文章，是一种温柔地留住时间的方式</h3>
+            <div class="post-meta">2026-03-30 · 5 min read</div>
+            <div class="post-excerpt">
+              许多值得记住的东西，并不是惊天动地的大事，而是一些很普通却很真实的片段。
+              比如一场电影、一次散步、一段深夜聊天、一次久别重逢。写下来之后，时间就有了形状。
+            </div>
+            <a href="javascript:void(0)" class="read-more">阅读全文 →</a>
+          </article>
+
+          <article class="post-card">
+            <div class="post-tag">技术随笔</div>
+            <h3>为什么博客首页不应该一上来就堆满内容</h3>
+            <div class="post-meta">2026-03-28 · 6 min read</div>
+            <div class="post-excerpt">
+              一个有识别度的博客首页，应该先建立气质，再引导阅读。首屏负责让访客停下来，正文负责让访客继续看。
+              这也是封面页存在的意义：不是为了炫技，而是为了建立第一印象。
+            </div>
+            <a href="javascript:void(0)" class="read-more">阅读全文 →</a>
+          </article>
+
+          <article class="post-card">
+            <div class="post-tag">纪念时刻</div>
+            <h3>有些页面不是单纯的网页，而是一种情绪的保存方式</h3>
+            <div class="post-meta">2026-03-24 · 4 min read</div>
+            <div class="post-excerpt">
+              当网页不再只是信息容器，它就会拥有更深的意义。它可以是纪念册，是信件，是序章，
+              是每一次打开都能重新唤起回忆的地方。
+            </div>
+            <a href="javascript:void(0)" class="read-more">阅读全文 →</a>
+          </article>
+        </div>
+
+        <aside class="sidebar">
+          <section class="about-card" id="about">
+            <h3 class="section-title">关于我</h3>
+            <p>
+              这里可以放你的个人介绍。比如：热爱记录、喜欢设计与文字，偶尔写技术，偶尔写生活，
+              希望把细碎而珍贵的日常，慢慢整理成值得反复翻阅的内容。
+            </p>
+          </section>
+
+          <section class="about-card">
+            <h3 class="section-title">分类</h3>
+            <ul class="cat-list">
+              <li>生活日记</li>
+              <li>技术随笔</li>
+              <li>旅行见闻</li>
+              <li>摄影记录</li>
+              <li>纪念时刻</li>
+            </ul>
+          </section>
+
+          <section class="about-card">
+            <h3 class="section-title">归档</h3>
+            <ul class="archive-list">
+              <li>2026 年 3 月</li>
+              <li>2026 年 2 月</li>
+              <li>2026 年 1 月</li>
+            </ul>
+          </section>
+        </aside>
+      </section>
+
+      <footer class="site-footer" id="footer">
+        <div class="footer-card">
+          <p>© 2026 Memory Blog. All rights reserved.</p>
+          <p>封面页与博客页已整合为单页结构，可继续扩展为多篇文章详情页。</p>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <script>
+    // 进入博客区
+    document.getElementById('enterBlogBtn').addEventListener('click', function () {
+      document.getElementById('blog').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // 纪念时间
+    const together = new Date(2018, 2, 2, 12, 22, 0, 0);
+    const clockEl = document.getElementById('elapseClock');
+
+    function updateElapseClock() {
+      const now = new Date();
+      let diff = Math.max(0, now - together);
+      const day = Math.floor(diff / (24 * 60 * 60 * 1000));
+      diff -= day * 24 * 60 * 60 * 1000;
+      const hour = Math.floor(diff / (60 * 60 * 1000));
+      diff -= hour * 60 * 60 * 1000;
+      const minute = Math.floor(diff / (60 * 1000));
+      diff -= minute * 60 * 1000;
+      const second = Math.floor(diff / 1000);
+
+      const pad = n => String(n).padStart(2, '0');
+      clockEl.textContent = `${day} days ${pad(hour)}:${pad(minute)}:${pad(second)}`;
+    }
+
+    updateElapseClock();
+    setInterval(updateElapseClock, 1000);
+
+    // 轻量爱心动画（替代原 jQuery + garden.js 依赖）
+    const canvas = document.getElementById('heartCanvas');
+    const ctx = canvas.getContext('2d');
+    const particles = [];
+    const W = canvas.width;
+    const H = canvas.height;
+    const cx = W / 2;
+    const cy = H / 2 - 10;
+
+    function heartPoint(t, scale = 12) {
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+      return { x: cx + x * scale, y: cy + y * scale };
+    }
+
+    for (let i = 0; i < 220; i++) {
+      const t = Math.random() * Math.PI * 2;
+      const p = heartPoint(t, 11 + Math.random() * 2.5);
+      particles.push({
+        x: p.x,
+        y: p.y,
+        r: Math.random() * 2.2 + 0.6,
+        a: Math.random() * 0.6 + 0.3,
+        pulse: Math.random() * Math.PI * 2
+      });
+    }
+
+    function drawHeart() {
+      ctx.clearRect(0, 0, W, H);
+
+      // 发光背景
+      const glow = ctx.createRadialGradient(cx, cy, 20, cx, cy, 170);
+      glow.addColorStop(0, 'rgba(255,190,210,0.18)');
+      glow.addColorStop(1, 'rgba(255,190,210,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, 170, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 心形轨迹
+      ctx.beginPath();
+      for (let i = 0; i <= 200; i++) {
+        const t = i / 200 * Math.PI * 2;
+        const p = heartPoint(t, 12);
+        if (i === 0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      }
+      ctx.strokeStyle = 'rgba(255,210,225,0.65)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // 粒子
+      const time = Date.now() * 0.003;
+      for (const p of particles) {
+        const alpha = p.a + Math.sin(time + p.pulse) * 0.18;
+        ctx.fillStyle = `rgba(255,215,228,${alpha})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r + Math.sin(time + p.pulse) * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      requestAnimationFrame(drawHeart);
+    }
+
+    drawHeart();
+  </script>
 </body>
 </html>
